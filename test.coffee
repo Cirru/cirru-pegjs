@@ -4,7 +4,7 @@ PEG = require "pegjs"
 PEGjsCoffeePlugin = require 'pegjs-coffee-plugin'
 PEGjsCoffeePlugin.addTo PEG
 
-source_file = "./code.cr"
+source_file = "./indent.cr"
 peg_file = "./cirru.pegcoffee"
 
 mainTest = ->

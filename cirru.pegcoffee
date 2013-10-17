@@ -21,6 +21,7 @@
     null unless isIndent
   @dedent = (level) =>
     level = count level
+    console.log "level is:", level
     isDedent = level < @level
     @level = level
     null unless isDedent
@@ -29,6 +30,7 @@
 
 start
 = seps* head:sentence body:seps_sentence* seps* { @unshift head, body }
+/ seps* { [] }
 
 
 seps_sentence
@@ -52,15 +54,15 @@ exp
 / "(" space* head:exp body:spaces_exp* space* ")" { @unshift head, body }
 / "(" space+ ")" { [] }
 / "$" exp:spaces_exp* space* { @mark(); exp }
-/ space* indent exp dedent { exp }
+/ indent exp dedent { console.log "a test"; exp }
 
 
 indent
-= "\n" level:space* { @indent level }
+= space* newline level:space* { @indent level }
 
 
 dedent
-= "\n" level:space* { @count level}
+= space* newline level:space* { @count level}
 
 
 word 
@@ -106,4 +108,5 @@ space
 
 
 newline
-= "\n"
+= [\n]+
+/ "\n" [\n ]+ "\n"
