@@ -1,0 +1,80 @@
+{
+  @return_x = -> "xxxxx"
+  @unshift = (head, body) ->
+    body.unshift head
+    body
+  @join = (list) ->
+    string = list.join ""
+    string
+}
+
+
+start
+= seps* head:sentence body:seps_sentence* seps* { @unshift head, body }
+
+
+seps_sentence
+= seps sentence:sentence { sentence }
+
+
+sentence
+= head:exp body:seps_exp* { @unshift head, body }
+
+
+seps_exp
+= sep exp:exp { exp }
+
+
+spaces_exp
+= space+ exp:exp { exp }
+
+
+exp
+= words:word+ { @join words }
+/ "(" space* head:exp body:spaces_exp* space* ")" { @unshift head, body }
+
+
+word 
+= chars:char+ { @join chars }
+/ string
+
+
+string
+= '"' buffer:buffer* '"' { @join buffer }
+
+
+buffer
+= char:char { char }
+/ " " { " " }
+/ '\\"' { '"' }
+/ "\\\\" { "\\" }
+/ "\\/"  { "/" }
+/ "\\b"  { "\b" }
+/ "\\f"  { "\f" }
+/ "\\n"  { "\n" }
+/ "\\r"  { "\r" }
+/ "\\t"  { "\t" }
+
+char
+= char:[^"\\\0-\x1F\x7f() ] { char }
+
+
+line_break
+= "\n"
+
+
+seps
+= sep+
+
+
+sep
+= space
+/ newline
+
+
+space
+= " "
+
+
+newline
+= "\n"
