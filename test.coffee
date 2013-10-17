@@ -13,8 +13,8 @@ mainTest = ->
       parser = PEG.buildParser rules
       fs.readFile source_file, "utf8", (err, code) ->
         try
-          result = parser.parse code
           console.log "==============================="
+          result = parser.parse code
           console.log JSON.stringify result, null, 2
         catch generator_err
           console.log "parser failed", generator_err

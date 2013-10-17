@@ -1,4 +1,8 @@
 {
+  count = (n) ->
+    Math.ceil (n / 2)
+  @marks = []
+  @level = 0
   @return_x = -> "xxxxx"
   @unshift = (head, body) ->
     body.unshift head
@@ -6,6 +10,20 @@
   @join = (list) ->
     string = list.join ""
     string
+  @mark = =>
+    console.log "mark $"
+    @marks.push @level
+  @indent = (level) =>
+    level = count level
+    console.log "level is:", level
+    isIndent = level > @level
+    @level = level
+    null unless isIndent
+  @dedent = (level) =>
+    level = count level
+    isDedent = level < @level
+    @level = level
+    null unless isDedent
 }
 
 
@@ -32,11 +50,22 @@ spaces_exp
 exp
 = words:word+ { @join words }
 / "(" space* head:exp body:spaces_exp* space* ")" { @unshift head, body }
+/ "(" space+ ")" { [] }
+/ "$" exp:spaces_exp* space* { @mark(); exp }
+/ space* indent exp dedent { exp }
+
+
+indent
+= "\n" level:space* { @indent level }
+
+
+dedent
+= "\n" level:space* { @count level}
 
 
 word 
-= chars:char+ { @join chars }
-/ string
+= chars:([^"\\\0-\x1F\x7f()$ ]char*) { @join chars }
+/ string:string { string }
 
 
 string
