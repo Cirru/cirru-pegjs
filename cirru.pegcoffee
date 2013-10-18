@@ -1,82 +1,69 @@
 {
   count = (n) ->
     Math.ceil (n / 2)
+  
   @marks = []
+  
   @level = 0
-  @return_x = -> "xxxxx"
+
   @unshift = (head, body) ->
     body.unshift head
     body
+  
   @join = (list) ->
-    string = list.join ""
-    string
+    list.join ""
+  
   @mark = =>
     console.log "mark $"
     @marks.push @level
+  
   @indent = (level) =>
-    console.log "indent is:", level
     level = count level.length
     isIndent = level > @level
+    console.log "#{@level} -> #{level} :: #{isIndent}"
     @level = level
     null unless isIndent
-    ""
-  @dedent = (level) =>
-    console.log "dedent is:", level
-    level = count level.length
-    isDedent = level < @level
-    @level = level
-    null unless isDedent
-    ""
 }
 
-
 start
-= seps* head:sentence body:seps_sentence* seps* { @unshift head, body }
-/ seps* { [] }
+= newline* head:sentence body:n_and_sentence* newline* { @unshift head..., body }
+/ newline* { [] }
 
 
-seps_sentence
-= line_sep sentence:sentence { sentence }
+n_and_sentence
+= newline sentence:sentence { sentence }
 
 
 sentence
-= head:exp body:seps_exp* { @unshift head, body }
+= head:exp body:space_and_exp* { @unshift head, body }
 
 
-seps_exp
-= space+ exp:exp { exp }
+space_and_exp
+= space exp:exp { exp }
 
 
-line_sep
-= space* newline
-
-
-spaces_exp
-= space+ exp:exp { exp }
+space_and_exp
+= space exp:exp { exp }
 
 
 exp
-= phrase:phrase indent exp:exp dedent { @unshift phrase..., [exp] }
-/ "(" space* head:exp body:spaces_exp* space* ")" { @unshift head, body }
-/ "(" space+ ")" { [] }
-/ "$" exp:spaces_exp* space* { @mark(); exp }
+= phrase:phrase indent exp:exp+ { [phrase..., exp...] }
+/ "(" space* head:exp body:space_and_exp* ")" { @unshift head, body }
+/ "(" space ")" { [] }
+/ "$" exp:space_and_exp* { @mark(); exp }
 / phrase:phrase { phrase }
 
 
 phrase
-= head:word body:(spaces_word)* { @unshift head, body }
+= head:word body:(space_and_word)* { @unshift head, body }
 
 
 indent
-= space* newline level:space* { @indent level }
+= newline level:a_space* { @indent level }
 
 
-dedent
-= space* newline level:space* { @dedent level}
-
-
-spaces_word
-= space* word:word { word }
+space_and_word
+= space word:word { word }
 
 
 word 
@@ -100,27 +87,22 @@ buffer
 / "\\r"  { "\r" }
 / "\\t"  { "\t" }
 
+
 char
 = char:[^"\\\0-\x1F\x7f() ] { char }
 
 
-line_break
+newline
+= (space* n)+
+
+
+n
 = "\n"
 
 
-seps
-= sep+
-
-
-sep
-= space
-/ newline
-
-
 space
+= space:[ ]+ { @join space }
+
+
+a_space
 = " "
-
-
-newline
-= [\n]+
-/ "\n" [\n ]+ "\n"
