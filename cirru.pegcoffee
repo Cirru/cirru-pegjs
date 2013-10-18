@@ -14,17 +14,19 @@
     console.log "mark $"
     @marks.push @level
   @indent = (level) =>
-    level = count level
-    console.log "level is:", level
+    console.log "indent is:", level
+    level = count level.length
     isIndent = level > @level
     @level = level
     null unless isIndent
+    ""
   @dedent = (level) =>
-    level = count level
-    console.log "level is:", level
+    console.log "dedent is:", level
+    level = count level.length
     isDedent = level < @level
     @level = level
     null unless isDedent
+    ""
 }
 
 
@@ -34,7 +36,7 @@ start
 
 
 seps_sentence
-= seps sentence:sentence { sentence }
+= line_sep sentence:sentence { sentence }
 
 
 sentence
@@ -42,7 +44,11 @@ sentence
 
 
 seps_exp
-= sep exp:exp { exp }
+= space+ exp:exp { exp }
+
+
+line_sep
+= space* newline
 
 
 spaces_exp
@@ -50,11 +56,15 @@ spaces_exp
 
 
 exp
-= words:word+ { @join words }
+= phrase:phrase indent exp:exp dedent { @unshift phrase..., [exp] }
 / "(" space* head:exp body:spaces_exp* space* ")" { @unshift head, body }
 / "(" space+ ")" { [] }
 / "$" exp:spaces_exp* space* { @mark(); exp }
-/ indent exp dedent { console.log "a test"; exp }
+/ phrase:phrase { phrase }
+
+
+phrase
+= head:word body:(spaces_word)* { @unshift head, body }
 
 
 indent
@@ -62,7 +72,11 @@ indent
 
 
 dedent
-= space* newline level:space* { @count level}
+= space* newline level:space* { @dedent level}
+
+
+spaces_word
+= space* word:word { word }
 
 
 word 

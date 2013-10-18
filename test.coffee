@@ -1,6 +1,7 @@
 
 fs = require "fs"
 PEG = require "pegjs"
+util = require "util"
 PEGjsCoffeePlugin = require 'pegjs-coffee-plugin'
 PEGjsCoffeePlugin.addTo PEG
 
@@ -14,6 +15,10 @@ mainTest = ->
       fs.readFile source_file, "utf8", (err, code) ->
         try
           console.log "==============================="
+          console.log \
+            code
+            .replace(/\n/g, "/")
+            .replace(/\s/g, ".")
           result = parser.parse code
           console.log JSON.stringify result, null, 2
         catch generator_err

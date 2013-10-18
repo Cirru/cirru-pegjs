@@ -1,0 +1,19 @@
+
+start
+= space* word indent (word space*) indent 
+
+
+space
+= " "
+
+indent
+= newline space*
+
+word
+= [a-z]+
+
+newlines
+= [\n ]+
+
+newline
+= "\n"
